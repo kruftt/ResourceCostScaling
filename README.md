@@ -18,11 +18,9 @@ For example:
   
 <br />
   
-#### Author Info
+#### Additional Info
 ---
   
-To report issues or request features contact me via discord in the Valheim modding server or via DM.  
-  
-
+[Github Repo](https://github.com/kruftt/ResourceCostScaling)  
 [Valheim Modding Server](https://discord.com/invite/89bBsvK5KC)  
-`Discord ID`: Kruft#6332  
+`Discord ID:` Kruft#6332  

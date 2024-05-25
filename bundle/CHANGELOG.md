@@ -1,7 +1,7 @@
 ### Changelog
 
 ##### 0.1.3
-- Replace Bronze5 detection logic
+- Reimplement Bronze5 detection using negative values
 - Reimplement `RoundedValueRange`
 
 ##### 0.1.2
