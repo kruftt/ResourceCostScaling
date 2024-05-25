@@ -1,0 +1,9 @@
+{
+    "name": "ResourceCostScaling",
+    "version_number": "0.1.3",
+    "website_url": "",
+    "description": "Scales all piece and crafting resource costs.",
+    "dependencies": [
+        "denikson-BepInExPack_Valheim-5.4.2202"
+    ]
+}

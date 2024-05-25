@@ -1,0 +1,7 @@
+.vscode
+build/
+dist/
+libs/
+obj/
+NuGet.Config
+*.sln
