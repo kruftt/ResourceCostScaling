@@ -24,7 +24,6 @@ namespace ResourceCostScaling
         
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(PLUGIN_NAME);
         
-
         public void Awake()
         {
             configSync = new (PLUGIN_GUID) {
