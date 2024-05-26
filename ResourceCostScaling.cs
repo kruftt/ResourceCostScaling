@@ -18,11 +18,13 @@ namespace ResourceCostScaling
         private const string PLUGIN_NAME = "Resource Cost Scaling";
         private const string PLUGIN_VERSION = PluginInfo.PLUGIN_VERSION;
         private const string PLUGIN_MIN_VERSION = "0.1.0";
-        private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(PLUGIN_NAME);
+        
         private static ConfigSync configSync;
-        private static ConfigEntry<bool> configLocked;
         private static ConfigEntry<double> scaleFactor;
         
+        private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(PLUGIN_NAME);
+        
+
         public void Awake()
         {
             configSync = new (PLUGIN_GUID) {
@@ -31,11 +33,12 @@ namespace ResourceCostScaling
                 MinimumRequiredVersion = PLUGIN_MIN_VERSION
             };
 
-            configLocked = config("General", "configLocked", true, "Force Server Config");
+            configSync.AddLockingConfigEntry(config("General", "configLocked", true, "Force Server Config"));
             scaleFactor = config("General", "scaleFactor", 1.0, new ConfigDescription(
                 "Multiply all resource costs by this value. Round up if resulting decimal is over 0.1. Minimum result of 1.",
-                new RoundedValueRange(0.0, 2.0, 0.05)));
-            configSync.AddLockingConfigEntry(configLocked);
+                new RoundedValueRange(0.0, 2.0, 0.05))
+            );
+            
             new Harmony(PLUGIN_GUID).PatchAll(typeof(ResourceCostScalingPatches));
         }
 
