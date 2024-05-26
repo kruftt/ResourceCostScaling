@@ -2,7 +2,9 @@
 
 ##### 0.1.3
 - Reimplement Bronze5 detection using negative values
-- Reimplement `RoundedValueRange`
+- Remove `base()` calls from `RoundedValueRange`
+- Unify transpiler methods
+- Add [github](https://github.com/kruftt/ResourceCostScaling)  
 
 ##### 0.1.2
 - Convert `scaleFactor` to double

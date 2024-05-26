@@ -34,20 +34,28 @@ namespace ResourceCostScaling
                 CurrentVersion = PluginInfo.PLUGIN_VERSION,
                 MinimumRequiredVersion = PLUGIN_MIN_VERSION
             };
-            
+
             configLocked = config("General", "configLocked", true, "Force Server Config");
             scaleFactor = config("General", "scaleFactor", 1.0, new ConfigDescription(
                 "Multiply all resource costs by this value. Round up if resulting decimal is over 0.1. Minimum result of 1.",
                 new RoundedValueRange(0.0, 2.0, 0.05)));
             configSync.AddLockingConfigEntry(configLocked);
-            harmony.PatchAll();
+            harmony.PatchAll(typeof(ResourceCostScalingPatches));
         }
-        
-        [HarmonyPatch(typeof(ZNetScene), "Awake")]
-        [HarmonyPriority(Priority.Last)]
-        class ZNetSceneAwakePatch
+
+        private static int ScaleResource(int amount)
         {
-            static void Postfix()
+            return (amount > 0) ? Math.Max(1, (int)Math.Ceiling((amount * scaleFactor.Value) - 0.11))
+                : (amount < 0) ? 5 * Math.Max(1, (int)Math.Ceiling(((-amount) * scaleFactor.Value) - 0.11))
+                : 0;
+        }
+
+        class ResourceCostScalingPatches
+        {
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(ZNetScene), "Awake")]
+            [HarmonyPriority(Priority.Last)]
+            static void ZNetSceneAwakePostfix()
             {
                 Recipe recipe = ObjectDB.instance.m_recipes.Find((r) => r.name.Equals("Recipe_Bronze5"));
                 if (recipe == null)
@@ -60,51 +68,21 @@ namespace ResourceCostScaling
                     req.m_amount = -req.m_amount / 5;
                 }
             }
-        }
 
-        private static int ScaleResource(int amount)
-        {
-            return (amount > 0) ? Math.Max(1, (int)Math.Ceiling((amount * scaleFactor.Value) - 0.11))
-                : (amount < 0) ? 5 * Math.Max(1, (int)Math.Ceiling(((-amount) * scaleFactor.Value) - 0.11))
-                : 0;
-        }
-
-        private static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions)
-        {
-            foreach (var instruction in instructions)
+            [HarmonyTranspiler]
+            [HarmonyPatch(typeof(Piece), "DropResources")]
+            [HarmonyPatch(typeof(Piece.Requirement), "GetAmount")]
+            [HarmonyPatch(typeof(Player), "HaveRequirements", new[] { typeof(Piece), typeof(Player.RequirementMode) })]
+            static IEnumerable<CodeInstruction> AmountsTranspiler(IEnumerable<CodeInstruction> instructions)
             {
-                yield return instruction;
-                if (instruction.LoadsField(f_Amount) || instruction.LoadsField(f_AmountPerLevel))
+                foreach (var instruction in instructions)
                 {
-                    yield return new CodeInstruction(OpCodes.Call, m_ScaleResource);
+                    yield return instruction;
+                    if (instruction.LoadsField(f_Amount) || instruction.LoadsField(f_AmountPerLevel))
+                    {
+                        yield return new CodeInstruction(OpCodes.Call, m_ScaleResource);
+                    }
                 }
-            }
-        }
-
-        [HarmonyPatch(typeof(Piece.Requirement), "GetAmount")]
-        class RequirementGetAmountPatch
-        {
-            static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-            {
-                return Transpile(instructions);
-            }
-        }
-
-        [HarmonyPatch(typeof(Player), "HaveRequirements", new [] { typeof(Piece), typeof(Player.RequirementMode) })]
-        class PlayerHaveRequirementsPatch
-        {
-            static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-            {
-                return Transpile(instructions);
-            }
-        }
-
-        [HarmonyPatch(typeof(Piece), "DropResources")]
-        class PieceDropResourcesPatch
-        {
-            static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-            {
-                return Transpile(instructions);
             }
         }
 
