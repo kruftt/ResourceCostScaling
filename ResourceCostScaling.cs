@@ -18,14 +18,10 @@ namespace ResourceCostScaling
         private const string PLUGIN_NAME = "Resource Cost Scaling";
         private const string PLUGIN_VERSION = PluginInfo.PLUGIN_VERSION;
         private const string PLUGIN_MIN_VERSION = "0.1.0";
-        private readonly Harmony harmony = new (PLUGIN_GUID);
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(PLUGIN_NAME);
+        private static ConfigSync configSync;
         private static ConfigEntry<bool> configLocked;
         private static ConfigEntry<double> scaleFactor;
-        private static ConfigSync configSync;
-        private static FieldInfo f_Amount = AccessTools.Field(typeof(Piece.Requirement), "m_amount");
-        private static FieldInfo f_AmountPerLevel = AccessTools.Field(typeof(Piece.Requirement), "m_amountPerLevel");
-        private static readonly MethodInfo m_ScaleResource = AccessTools.Method(typeof(ResourceCostScalingPlugin), "ScaleResource");
         
         public void Awake()
         {
@@ -40,7 +36,7 @@ namespace ResourceCostScaling
                 "Multiply all resource costs by this value. Round up if resulting decimal is over 0.1. Minimum result of 1.",
                 new RoundedValueRange(0.0, 2.0, 0.05)));
             configSync.AddLockingConfigEntry(configLocked);
-            harmony.PatchAll(typeof(ResourceCostScalingPatches));
+            new Harmony(PLUGIN_GUID).PatchAll(typeof(ResourceCostScalingPatches));
         }
 
         private static int ScaleResource(int amount)
@@ -52,6 +48,10 @@ namespace ResourceCostScaling
 
         class ResourceCostScalingPatches
         {
+            private static readonly MethodInfo m_ScaleResource = AccessTools.Method(typeof(ResourceCostScalingPlugin), "ScaleResource");
+            private static FieldInfo f_Amount = AccessTools.Field(typeof(Piece.Requirement), "m_amount");
+            private static FieldInfo f_AmountPerLevel = AccessTools.Field(typeof(Piece.Requirement), "m_amountPerLevel");
+
             [HarmonyPostfix]
             [HarmonyPatch(typeof(ZNetScene), "Awake")]
             [HarmonyPriority(Priority.Last)]
