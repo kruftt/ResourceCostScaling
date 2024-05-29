@@ -17,10 +17,10 @@ namespace ResourceCostScaling
         private const string PLUGIN_GUID = PluginInfo.PLUGIN_GUID;
         private const string PLUGIN_NAME = "Resource Cost Scaling";
         private const string PLUGIN_VERSION = PluginInfo.PLUGIN_VERSION;
-        private const string PLUGIN_MIN_VERSION = "0.1.0";
+        private const string PLUGIN_MIN_VERSION = "0.2.0";
         
         private static ConfigSync configSync;
-        private static ConfigEntry<double> scaleFactor;
+        private static ConfigEntry<float> scaleFactor;
         
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(PLUGIN_NAME);
         
@@ -32,27 +32,27 @@ namespace ResourceCostScaling
                 MinimumRequiredVersion = PLUGIN_MIN_VERSION
             };
 
-            configSync.AddLockingConfigEntry(config("General", "configLocked", true, "Force Server Config"));
-            scaleFactor = config("General", "scaleFactor", 1.0, new ConfigDescription(
-                "Multiply all resource costs by this value. Round up if resulting decimal is over 0.1. Minimum result of 1.",
-                new RoundedValueRange(0.0, 2.0, 0.05))
+            configSync.AddLockingConfigEntry(config("General", "0. Force Server Config", true, "Force clients to use the server's configuration settings."));
+            scaleFactor = config("General", "1. Scale Factor", 1.0f, new ConfigDescription(
+                "Multiply all resource costs by this value. Midpoints round to even numbers. Minimum result of 1.",
+                new RoundedValueRange(0.0f, 2.0f, 0.05f))
             );
             
             new Harmony(PLUGIN_GUID).PatchAll(typeof(ResourceCostScalingPatches));
         }
 
-        private static int ScaleResource(int amount)
-        {
-            return (amount > 0) ? Math.Max(1, (int)Math.Ceiling((amount * scaleFactor.Value) - 0.11))
-                : (amount < 0) ? 5 * Math.Max(1, (int)Math.Ceiling(((-amount) * scaleFactor.Value) - 0.11))
-                : 0;
-        }
-
         class ResourceCostScalingPatches
         {
-            private static readonly MethodInfo m_ScaleResource = AccessTools.Method(typeof(ResourceCostScalingPlugin), "ScaleResource");
+            private static readonly MethodInfo m_ScaleResource = AccessTools.Method(typeof(ResourceCostScalingPatches), "ScaleResource");
             private static FieldInfo f_Amount = AccessTools.Field(typeof(Piece.Requirement), "m_amount");
             private static FieldInfo f_AmountPerLevel = AccessTools.Field(typeof(Piece.Requirement), "m_amountPerLevel");
+
+            private static int ScaleResource(int amount)
+            {
+                return (amount > 0) ? Math.Max(1, (int)Math.Round(amount * scaleFactor.Value))
+                    : (amount < 0) ? 5 * Math.Max(1, (int)Math.Round((-amount) * scaleFactor.Value))
+                    : 0;
+            }
 
             [HarmonyPostfix]
             [HarmonyPatch(typeof(ZNetScene), "Awake")]
@@ -98,21 +98,21 @@ namespace ResourceCostScaling
             return configEntry;
         }
 
-        class RoundedValueRange : AcceptableValueRange<double>
+        class RoundedValueRange : AcceptableValueRange<float>
         {
-            private double step;
-            public RoundedValueRange(double min, double max, double step = 0.01f) : base(min, max)
+            private float step;
+            public RoundedValueRange(float min, float max, float step = 0.01f) : base(min, max)
             {
                 this.step = step;
             }
             public override object Clamp(object value)
             {
-                double v = Convert.ToDouble(value) + (0.5 * step);
-                return (v < this.MinValue) ? this.MinValue : (v > this.MaxValue) ? this.MaxValue : v - (v % step);
+                float v = Convert.ToSingle(value) + (0.5f * step);
+                return (v < this.MinValue) ? this.MinValue : (v > this.MaxValue) ? this.MaxValue : (float)Math.Round(v - (v % step), 2);
             }
             public override bool IsValid(object value)
             {
-                double v = Convert.ToDouble(value);
+                float v = Convert.ToSingle(value);
                 return (v < this.MinValue) && (v > this.MaxValue) && (v % step == 0);
             }
         }

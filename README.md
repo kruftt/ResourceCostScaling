@@ -2,18 +2,20 @@
 ---
 Scales all piece and crafting resource costs using a single configuration value.
 
-Rounds up if fraction is greater than 0.1
+Rounds toward nearest integer, midpoints round to even numbers.
 
 ```
-2 x 1.10 = 2.2 -> 3
-2 x 1.05 = 2.1 -> 2
-...
-2 x 0.60 = 1.2 -> 2
-2 x 0.55 = 1.1 -> 1
+2 x 1.25 = 2.5 -> 2
+2 x 1.3 = 2.6 -> 3
+```
+```
+2 x 1.7 = 3.4 -> 3
+2 x 1.75 = 3.5 -> 4
 ```
 
 [ServerSync enabled](https://github.com/blaxxun-boop/ServerSync)  
 [Valheim Modding Server](https://discord.com/invite/89bBsvK5KC)  
+[Thunderstore](https://thunderstore.io/c/valheim/p/kruft/ResourceCostScaling/)
 [Github](https://github.com/kruftt/ResourceCostScaling)  
 
 `Discord:` Kruft#6332  

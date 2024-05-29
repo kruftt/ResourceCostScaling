@@ -1,5 +1,10 @@
 ### Changelog
 
+##### 0.2.0
+- Switch from Cieling to Round (mid-points round to even values)
+- Rename configuration settings
+- Add Scaling image
+
 ##### 0.1.3
 - Reimplement Bronze5 detection using negative values
 - Remove `base()` calls from `RoundedValueRange`
