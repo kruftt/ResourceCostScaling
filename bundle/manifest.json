@@ -1,6 +1,6 @@
 {
     "name": "ResourceCostScaling",
-    "version_number": "0.2.0",
+    "version_number": "0.3.0",
     "website_url": "",
     "description": "Scales all piece and crafting resource costs.",
     "dependencies": [

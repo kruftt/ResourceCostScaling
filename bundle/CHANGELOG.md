@@ -1,5 +1,8 @@
 ### Changelog
 
+##### 0.3.0
+- Add support for setting resource scaling to zero.
+
 ##### 0.2.0
 - Switch from Cieling to Round (mid-points round to even values)
 - Rename configuration settings
