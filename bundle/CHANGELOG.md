@@ -1,5 +1,8 @@
 ### Changelog
 
+##### 0.3.1
+- Remove `BepinProcess` specification for [dedicated server process name issue](https://github.com/kruftt/ResourceCostScaling/issues/1).
+
 ##### 0.3.0
 - Add support for setting resource scaling to zero.
 

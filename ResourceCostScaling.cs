@@ -11,7 +11,6 @@ using BepInEx.Logging;
 namespace ResourceCostScaling
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
-    [BepInProcess("valheim.exe")]
     public class ResourceCostScalingPlugin : BaseUnityPlugin
     {
         private const string PLUGIN_GUID = PluginInfo.PLUGIN_GUID;
