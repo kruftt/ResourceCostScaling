@@ -30,7 +30,8 @@
 
 [ServerSync enabled](https://github.com/blaxxun-boop/ServerSync)  
 [Valheim Modding Server](https://discord.com/invite/89bBsvK5KC)  
-[Thunderstore](https://thunderstore.io/c/valheim/p/kruft/ResourceCostScaling/)
+[Thunderstore](https://thunderstore.io/c/valheim/p/kruft/ResourceCostScaling/)  
 [Github](https://github.com/kruftt/ResourceCostScaling)  
-
-`Discord` Kruft#6332  
+  
+`Discord` [Kruft#6332](https://discordapp.com/channels/@me/458698801004412928)  
+[☕ Buy me a coffee! 🙏](https://buymeacoffee.com/kruft)  
